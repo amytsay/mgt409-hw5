@@ -1,0 +1,8 @@
+# Campus Customs HW5 backend + MCP server
+# pydantic-ai-slim with the [openai] extra (per class rules) plus [mcp]: the agents reach shop data only through
+# the MCP server, and PydanticAI's MCPToolset needs the MCP extra. Deliberate, documented exception.
+pydantic-ai-slim[openai,mcp]>=2.66
+fastmcp>=4.1                 # FastMCP server (mcp_server/server.py) and stdio client
+fastapi
+uvicorn
+python-dotenv

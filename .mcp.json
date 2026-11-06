@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "campus-customs": {
+      "type": "stdio",
+      "command": "C:/Users/mimit/OneDrive/Documents/Yale EMBA/AI Foundations/Homework/Homework 5/hw5/.venv/Scripts/python.exe",
+      "args": [
+        "C:/Users/mimit/OneDrive/Documents/Yale EMBA/AI Foundations/Homework/Homework 5/hw5/mcp_server/server.py"
+      ]
+    }
+  }
+}

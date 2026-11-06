@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus Customs · Resolved Board (Problem 9)</title>
+<style>
+  :root {
+    --bg: #0b0b0f; --panel: #15151c; --panel-2: #1d1d27; --line: #2c2c3a;
+    --text: #f2f0f5; --muted: #b4afc0; --pink: #ff4fa3; --pink-soft: #ff8cc6; --pink-dim: rgba(255, 79, 163, 0.14);
+    --ok: #5fe0a8; --warn: #ffc857; --no: #ff7a7a; --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.6 "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif; }
+  a { color: var(--pink-soft); }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 24px 64px; }
+  header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px;
+    border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 24px; }
+  header h1 { margin: 0; font-size: 1.9rem; letter-spacing: -0.01em; }
+  header h1 span { color: var(--pink); }
+  header p { margin: 4px 0 0; color: var(--muted); }
+  .pill { background: var(--pink-dim); color: var(--pink-soft); border: 1px solid var(--pink); border-radius: 999px;
+    padding: 6px 14px; font-weight: 600; font-size: 0.9rem; white-space: nowrap; }
+
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  nav a { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px;
+    padding: 8px 16px; font-weight: 600; text-decoration: none; }
+  nav a:hover, nav a:focus-visible { color: var(--text); border-color: var(--pink-soft); outline: none; }
+
+  .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .summary div { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .summary b { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+  .summary span { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .summary .ok { color: var(--ok); }
+  .summary .neg { color: var(--no); }
+
+  section.ticket { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--ok);
+    border-radius: var(--radius); padding: 22px 24px; margin-bottom: 28px; scroll-margin-top: 16px; }
+  section.final { border-left-color: var(--pink); }
+  .label { display: inline-block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ok); margin-bottom: 4px; }
+  section.final .label { color: var(--pink); }
+  h2 { margin: 0 0 6px; font-size: 1.4rem; }
+  .status { display: inline-block; font-size: 0.75rem; font-weight: 700; border-radius: 6px; padding: 2px 10px; margin-left: 8px;
+    vertical-align: middle; background: rgba(95, 224, 168, 0.15); color: var(--ok); border: 1px solid var(--ok); }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin: 14px 0 18px; }
+  .facts div { background: var(--panel-2); border-radius: 10px; padding: 10px 14px; font-size: 0.95rem; }
+  .facts b { display: block; font-size: 0.72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  .route { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .agent { background: var(--pink-dim); border: 1px solid var(--pink); color: var(--pink-soft); border-radius: 999px;
+    padding: 1px 10px; font-weight: 600; font-size: 0.85rem; }
+  .arrow { color: var(--muted); }
+
+  .shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 16px; }
+  figure { margin: 0; background: var(--panel-2); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  figure a { display: block; }
+  figure img { display: block; width: 100%; height: auto; }
+  figure a:focus-visible { outline: 3px solid var(--pink-soft); outline-offset: -3px; }
+  figcaption { padding: 10px 14px; color: var(--muted); font-size: 0.9rem; }
+  figcaption b { color: var(--text); }
+  .wide { grid-column: 1 / -1; }
+  .money { margin: 14px 0 0; padding: 10px 14px; background: var(--panel-2); border-radius: 10px; font-variant-numeric: tabular-nums; }
+  .money .neg { color: var(--no); font-weight: 700; }
+  footer { margin-top: 32px; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 16px; }
+  code { font-family: Consolas, "Cascadia Mono", monospace; font-size: 0.9em; color: var(--pink-soft);
+    background: rgba(255, 140, 198, 0.08); padding: 1px 6px; border-radius: 6px; }
+  @media (max-width: 640px) { .wrap { padding: 20px 14px 48px; } section.ticket { padding: 18px 16px; } .shots { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>Campus Customs <span>·</span> Resolved Board</h1>
+    <p>Screenshots of the React dashboard (<i>Elm City Nights</i>, <code>frontend/</code>) for each ticket the agent team resolved on the clean Problem 9 run.</p>
+  </div>
+  <div class="pill">Shop today: 2026-08-31 · run 2026-11-05</div>
+</header>
+
+<nav aria-label="Jump to">
+  <a href="#t101">101 · Bulldog tee</a>
+  <a href="#t102">102 · Rent due</a>
+  <a href="#t103">103 · Bulk hoodies</a>
+  <a href="#final">Final board</a>
+  <a href="desk_tickets.html#cash">Cash tab ↗</a>
+</nav>
+
+<div class="summary" role="list" aria-label="Run summary">
+  <div role="listitem"><b>Tickets resolved</b><span class="ok">3 / 3</span></div>
+  <div role="listitem"><b>Starting checking</b><span>$3,400.00</span></div>
+  <div role="listitem"><b>Approved payments</b><span class="neg">−$3,240.00</span></div>
+  <div role="listitem"><b>Ending checking</b><span>$160.00</span></div>
+  <div role="listitem"><b>Pending (not paid)</b><span>$264.00</span></div>
+</div>
+
+<!-- ============================== 101 ============================== -->
+<section class="ticket" id="t101" aria-labelledby="h101">
+  <span class="label">Ticket 101 · customer_order · Special Delivery</span>
+  <h2 id="h101">Bulldog tee, size S <span class="status">RESOLVED</span></h2>
+  <div class="facts">
+    <div><b>Crew route</b><span class="route"><span class="agent">Boss</span><span class="arrow">→</span><span class="agent">Inventory</span><span class="arrow">→</span><span class="agent">Accounting</span><span class="arrow">→</span><span class="agent">Boss</span><span class="arrow">→</span><span class="agent">Customer Service</span></span></div>
+    <div><b>Outcome</b>Size S out; the reprint is already on invoice 501 (no duplicate order). Overdue $840 invoice queued. Private reply to the customer.</div>
+    <div><b>Run</b>d92a5eff83d4 · 7.4 s · 14 model calls · 13 tool calls</div>
+    <div><b>Human approval</b>Invoice 501, $840.00 → <b>approved</b></div>
+  </div>
+  <div class="shots">
+    <figure>
+      <a href="screenshots/101_board.jpg" target="_blank" rel="noopener"><img src="screenshots/101_board.jpg" alt="Dashboard after ticket 101: job 101 marked resolved on the Jobs board, the crew radio showing Boss, Stacks and Ledger messages, and the phone ringing with an $840 vendor invoice to approve. Checking shows $3,400.00." loading="lazy"></a>
+      <figcaption><b>Board:</b> job 101 is resolved, the crew radio shows the hand-offs, and LEDGER calls with the $840.00 invoice.</figcaption>
+    </figure>
+    <figure>
+      <a href="screenshots/101_debrief.jpg" target="_blank" rel="noopener"><img src="screenshots/101_debrief.jpg" alt="Crew debrief for job 101 with cards for Big Dog, Stacks, Ledger and Hotline and the route Big Dog to Stacks to Ledger to Hotline." loading="lazy"></a>
+      <figcaption><b>Debrief:</b> what each agent did and the delegation chain.</figcaption>
+    </figure>
+    <figure class="wide">
+      <a href="screenshots/101_approved.jpg" target="_blank" rel="noopener"><img src="screenshots/101_approved.jpg" alt="Dashboard after approving invoice 501: checking now shows $2,560.00 and the radio says You approved invoice-501, $840.00 left checking." loading="lazy"></a>
+      <figcaption><b>After I approved it:</b> checking drops from $3,400.00 to <b>$2,560.00</b>.</figcaption>
+    </figure>
+  </div>
+  <p class="money">Cash: $3,400.00 − <span class="neg">$840.00</span> (invoice 501, payment #1) = <b>$2,560.00</b></p>
+</section>
+
+<!-- ============================== 102 ============================== -->
+<section class="ticket" id="t102" aria-labelledby="h102">
+  <span class="label">Ticket 102 · rent_notice · Rent Day</span>
+  <h2 id="h102">Rent due <span class="status">RESOLVED</span></h2>
+  <div class="facts">
+    <div><b>Crew route</b><span class="route"><span class="agent">Boss</span><span class="arrow">→</span><span class="agent">Facilities</span><span class="arrow">→</span><span class="agent">Accounting</span><span class="arrow">→</span><span class="agent">Boss</span></span></div>
+    <div><b>Outcome</b>Notice verified against lease 1 ($2,400, due 2026-09-02). Rent queued as urgent. No customer reply needed.</div>
+    <div><b>Run</b>99aa52d36a81 · 6.1 s · 11 model calls · 11 tool calls</div>
+    <div><b>Human approval</b>Rent, lease 1, $2,400.00 → <b>approved</b></div>
+  </div>
+  <div class="shots">
+    <figure>
+      <a href="screenshots/102_board.jpg" target="_blank" rel="noopener"><img src="screenshots/102_board.jpg" alt="Dashboard after ticket 102: jobs 101 and 102 resolved, the radio showing Big Dog dispatching Keys and Keys calling get_lease and prepare_payment, and the phone with two sign-offs totaling $3,240." loading="lazy"></a>
+      <figcaption><b>Board:</b> jobs 101 and 102 are resolved, KEYS checks the lease, and the phone shows 2 sign-offs ($3,240.00).</figcaption>
+    </figure>
+    <figure>
+      <a href="screenshots/102_debrief.jpg" target="_blank" rel="noopener"><img src="screenshots/102_debrief.jpg" alt="Crew debrief for job 102 with cards for Big Dog, Ledger and Keys, the Boss's calls, and $2,400 to Elm City Properties queued for approval." loading="lazy"></a>
+      <figcaption><b>Debrief:</b> Boss → Keys (Facilities) → Ledger (Accounting); $2,400.00 queued for approval.</figcaption>
+    </figure>
+  </div>
+  <p class="money">Cash: $2,560.00 − <span class="neg">$2,400.00</span> (rent, payment #2) = <b>$160.00</b></p>
+</section>
+
+<!-- ============================== 103 ============================== -->
+<section class="ticket" id="t103" aria-labelledby="h103">
+  <span class="label">Ticket 103 · price_override · Bulk Deal</span>
+  <h2 id="h103">Bulk hoodie discount <span class="status">RESOLVED</span></h2>
+  <div class="facts">
+    <div><b>Crew route</b><span class="route"><span class="agent">Boss</span><span class="arrow">→</span><span class="agent">Accounting</span><span class="arrow">+</span><span class="agent">Inventory</span><span class="arrow">→</span><span class="agent">Accounting</span><span class="arrow">→</span><span class="agent">Boss</span><span class="arrow">→</span><span class="agent">Customer Service</span></span></div>
+    <div><b>Outcome</b>15% off approved by the Boss ($49.30 each, $986.00). 8 M in stock. The $264 restock of 12 is low-cash and deferred.</div>
+    <div><b>Run</b>8dc4d2342ecf · 102.7 s · 22 model calls · 22 tool calls</div>
+    <div><b>Human approval</b>Restock 12 × M, $264.00 → <b>left pending</b> (not paid)</div>
+  </div>
+  <div class="shots">
+    <figure>
+      <a href="screenshots/103_board.jpg" target="_blank" rel="noopener"><img src="screenshots/103_board.jpg" alt="Dashboard with all three jobs resolved (3 of 3 done) and the phone showing three sign-offs: $840 invoice for job 101, $2,400 rent for job 102, and a $264 restock for job 103 with a low-cash warning." loading="lazy"></a>
+      <figcaption><b>Board:</b> 3 / 3 jobs are done, and the phone lists all 3 sign-offs. The $264 restock carries the orange low-cash warning.</figcaption>
+    </figure>
+    <figure>
+      <a href="screenshots/103_debrief.jpg" target="_blank" rel="noopener"><img src="screenshots/103_debrief.jpg" alt="Crew debrief for job 103 with cards for Big Dog, Stacks, Ledger and Hotline and the route Big Dog to Ledger, Stacks, Ledger, Hotline." loading="lazy"></a>
+      <figcaption><b>Debrief:</b> discount approved within the Boss's limit, restock deferred to protect rent.</figcaption>
+    </figure>
+  </div>
+  <p class="money">Cash: $160.00 − $0.00 = <b>$160.00</b>. The discount is a selling price, not a payment, and the restock was left pending.</p>
+</section>
+
+<!-- ============================== FINAL ============================== -->
+<section class="ticket final" id="final" aria-labelledby="hfinal">
+  <span class="label">After my approvals</span>
+  <h2 id="hfinal">Final board: checking $160.00</h2>
+  <div class="shots">
+    <figure class="wide">
+      <a href="screenshots/102_approved_final.jpg" target="_blank" rel="noopener"><img src="screenshots/102_approved_final.jpg" alt="Final dashboard: checking $160.00, owed $0.00, all three jobs resolved, the radio showing both approvals, and only the $264 restock left on the phone, now also marked More than the checking balance." loading="lazy"></a>
+      <figcaption>Checking shows <b>$160.00</b> and owed shows <b>$0.00</b>. Both approvals are on the radio. Only the $264.00 restock is left, now also marked “More than the checking balance”.
+        This matches <code>cash_accounts</code> in <code>data/campus_customs_new.db</code>.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<footer>
+  Screenshots taken from the running dashboard at http://localhost:5173 (backend http://localhost:8000) during the Problem 9 run.
+  Customers appear as initials. Full details: <a href="desk_tickets.html">desk_tickets.html</a> (Actual + Cash tabs),
+  <code>resolved_tickets.json</code> and <code>audit_trail.json</code>.
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,352 @@
+{
+  "problem": "HW5 Problem 4, Panel B: MCP tool smoke test",
+  "vibe_coder": "Claude Code (Claude desktop app, Code tab)",
+  "mcp_server": {
+    "name": "campus-customs",
+    "transport": "stdio",
+    "config": ".mcp.json",
+    "script": "mcp_server/server.py",
+    "database": "data/campus_customs_new.db"
+  },
+  "shop_today": "2026-08-31 (desk.date_today)",
+  "user_prompt": "Okay to test the tools, I would like you to 1. check the stock for a random order 2. prepare a payment to an external vendor of $100 3. bulk order 10 hoodies. (Feel free to adjust these tests so that they're smooth and match the tools we created). Make sure for every tool to include the prompt asked, the tool name, and the tool output which must match values in data/campuscustoms_new.db",
+  "tests": [
+    {
+      "test": 1,
+      "prompt": "check the stock for a random order",
+      "how_adjusted": "Picked a real catalogue item that is not part of tickets 101-103: 5 Yale Caps (CC-HAT-BLUE, size OS).",
+      "tool": "check_stock_for_order",
+      "mcp_tool_id": "mcp__campus-customs__check_stock_for_order",
+      "arguments": {
+        "sku": "CC-HAT-BLUE",
+        "size": "OS",
+        "qty": 5
+      },
+      "output": {
+        "today": "2026-08-31",
+        "sku": "CC-HAT-BLUE",
+        "name": "Yale Cap",
+        "size": "OS",
+        "location": "Aisle C",
+        "requested_qty": 5,
+        "on_hand": 40,
+        "can_fill_from_stock": true,
+        "shortfall": 0,
+        "other_sizes_on_hand": {},
+        "list_price": 22,
+        "order_total_at_list": 110,
+        "open_restock_invoices": [],
+        "vendors": [
+          {
+            "vendor_id": 1,
+            "vendor": "Bulldog Print Co",
+            "specialty": "apparel reprint",
+            "lead_days": 5,
+            "earliest_arrival": "2026-09-05"
+          },
+          {
+            "vendor_id": 2,
+            "vendor": "Elm City Gifts",
+            "specialty": "mugs and small goods",
+            "lead_days": 3,
+            "earliest_arrival": "2026-09-03"
+          },
+          {
+            "vendor_id": 3,
+            "vendor": "QuickShip CT",
+            "specialty": "local courier",
+            "lead_days": 1,
+            "earliest_arrival": "2026-09-01"
+          }
+        ]
+      },
+      "result_summary": "40 on hand in Aisle C, so the 5-cap order can be filled from stock (shortfall 0); $110.00 at the $22 list price.",
+      "db_verification": {
+        "checked_against": "data/campus_customs_new.db (read-only SQL, independent of the server)",
+        "fields_checked": 10,
+        "all_match": true,
+        "checks": [
+          {
+            "field": "today",
+            "value": "2026-08-31",
+            "db_source": "desk.date_today",
+            "matches": true
+          },
+          {
+            "field": "name",
+            "value": "Yale Cap",
+            "db_source": "inventory.name",
+            "matches": true
+          },
+          {
+            "field": "location",
+            "value": "Aisle C",
+            "db_source": "inventory.location",
+            "matches": true
+          },
+          {
+            "field": "on_hand",
+            "value": 40,
+            "db_source": "inventory.qty",
+            "matches": true
+          },
+          {
+            "field": "shortfall",
+            "value": 0,
+            "db_source": "5 - inventory.qty",
+            "matches": true
+          },
+          {
+            "field": "other_sizes_on_hand",
+            "value": {},
+            "db_source": "inventory (other sizes)",
+            "matches": true
+          },
+          {
+            "field": "list_price",
+            "value": 22,
+            "db_source": "pricing.list_price",
+            "matches": true
+          },
+          {
+            "field": "order_total_at_list",
+            "value": 110,
+            "db_source": "pricing.list_price x 5",
+            "matches": true
+          },
+          {
+            "field": "open_restock_invoices",
+            "value": 0,
+            "db_source": "invoices",
+            "matches": true
+          },
+          {
+            "field": "vendors",
+            "value": [
+              [
+                1,
+                "Bulldog Print Co",
+                "apparel reprint",
+                5,
+                "2026-09-05"
+              ],
+              [
+                2,
+                "Elm City Gifts",
+                "mugs and small goods",
+                3,
+                "2026-09-03"
+              ],
+              [
+                3,
+                "QuickShip CT",
+                "local courier",
+                1,
+                "2026-09-01"
+              ]
+            ],
+            "db_source": "vendors + desk.date_today",
+            "matches": true
+          }
+        ]
+      }
+    },
+    {
+      "test": 2,
+      "prompt": "prepare a payment to an external vendor of $100",
+      "how_adjusted": "The DB has no $100 vendor bill, and the tool only prepares payments for real invoices and leases, so it can't make one up. Used the shop's only open vendor invoice instead: invoice 501, Bulldog Print Co, $840.",
+      "tool": "prepare_payment",
+      "mcp_tool_id": "mcp__campus-customs__prepare_payment",
+      "arguments": {
+        "kind": "invoice",
+        "ref_id": 501
+      },
+      "output": {
+        "today": "2026-08-31",
+        "payment_draft": {
+          "kind": "invoice",
+          "ref_id": 501,
+          "payee": "Bulldog Print Co",
+          "description": "Rush reprint CC-TEE-WHITE S",
+          "amount": 840,
+          "account": "checking"
+        },
+        "due_date": "2026-08-28",
+        "overdue": true,
+        "days_overdue": 3,
+        "days_until_due": 0,
+        "payable": true,
+        "not_payable_reason": null,
+        "prior_payments": [],
+        "cash_balance": 3400,
+        "balance_after_payment": 2560,
+        "other_unpaid_bills": [
+          {
+            "kind": "rent",
+            "ref_id": 1,
+            "payee": "Elm City Properties",
+            "amount": 2400,
+            "due_date": "2026-09-02",
+            "overdue": false,
+            "days_overdue": 0,
+            "days_until_due": 2
+          }
+        ],
+        "other_unpaid_total": 2400,
+        "low_cash_flag": false,
+        "low_cash_reason": null,
+        "requires_human_approval": true,
+        "status": "pending_human_approval",
+        "note": "Prepared only. No money has moved. A human must approve this payment before cash changes."
+      },
+      "result_summary": "Prepared, not paid: $840.00 to Bulldog Print Co, 3 days overdue; checking would go $3,400.00 -> $2,560.00, still covering the $2,400 rent (no low-cash flag). Status pending_human_approval.",
+      "db_verification": {
+        "checked_against": "data/campus_customs_new.db (read-only SQL, independent of the server)",
+        "fields_checked": 10,
+        "all_match": true,
+        "checks": [
+          {
+            "field": "payee",
+            "value": "Bulldog Print Co",
+            "db_source": "invoices.vendor_id -> vendors.name",
+            "matches": true
+          },
+          {
+            "field": "description",
+            "value": "Rush reprint CC-TEE-WHITE S",
+            "db_source": "invoices.description",
+            "matches": true
+          },
+          {
+            "field": "amount",
+            "value": 840,
+            "db_source": "invoices.amount",
+            "matches": true
+          },
+          {
+            "field": "due_date",
+            "value": "2026-08-28",
+            "db_source": "invoices.due_date",
+            "matches": true
+          },
+          {
+            "field": "days_overdue",
+            "value": 3,
+            "db_source": "desk.date_today - invoices.due_date",
+            "matches": true
+          },
+          {
+            "field": "prior_payments",
+            "value": 0,
+            "db_source": "payments",
+            "matches": true
+          },
+          {
+            "field": "cash_balance",
+            "value": 3400,
+            "db_source": "cash_accounts.balance",
+            "matches": true
+          },
+          {
+            "field": "balance_after_payment",
+            "value": 2560,
+            "db_source": "balance - amount",
+            "matches": true
+          },
+          {
+            "field": "other bill (rent)",
+            "value": [
+              "Elm City Properties",
+              2400,
+              "2026-09-02"
+            ],
+            "db_source": "leases",
+            "matches": true
+          },
+          {
+            "field": "low_cash_flag",
+            "value": false,
+            "db_source": "balance after < other unpaid",
+            "matches": true
+          }
+        ]
+      }
+    },
+    {
+      "test": 3,
+      "prompt": "bulk order 10 hoodies",
+      "how_adjusted": "The shop has one hoodie SKU: 10 Basic Hoodie Big Yale (CC-HOOD-NAVY). No discount price was requested, so the tool returns the list quote and the price floor.",
+      "tool": "quote_bulk_order",
+      "mcp_tool_id": "mcp__campus-customs__quote_bulk_order",
+      "arguments": {
+        "sku": "CC-HOOD-NAVY",
+        "qty": 10
+      },
+      "output": {
+        "sku": "CC-HOOD-NAVY",
+        "name": "Basic Hoodie Big Yale",
+        "qty": 10,
+        "list_price": 58,
+        "unit_cost": 22,
+        "total_at_list": 580,
+        "cost_total": 220,
+        "margin_at_list": 360,
+        "margin_pct_at_list": 62.1,
+        "price_floor_unit": 22,
+        "max_discount_pct_without_loss": 62.1,
+        "note": "The DB has no bulk-discount policy. Any price below list is a price override that needs human approval."
+      },
+      "result_summary": "$580.00 at list, $220.00 at cost, $360.00 margin (62.1%); price floor $22.00 per hoodie, so any bulk discount up to 62.1% avoids a loss.",
+      "db_verification": {
+        "checked_against": "data/campus_customs_new.db (read-only SQL, independent of the server)",
+        "fields_checked": 7,
+        "all_match": true,
+        "checks": [
+          {
+            "field": "name",
+            "value": "Basic Hoodie Big Yale",
+            "db_source": "inventory.name",
+            "matches": true
+          },
+          {
+            "field": "list_price",
+            "value": 58,
+            "db_source": "pricing.list_price",
+            "matches": true
+          },
+          {
+            "field": "unit_cost",
+            "value": 22,
+            "db_source": "pricing.unit_cost",
+            "matches": true
+          },
+          {
+            "field": "total_at_list",
+            "value": 580,
+            "db_source": "list_price x 10",
+            "matches": true
+          },
+          {
+            "field": "cost_total",
+            "value": 220,
+            "db_source": "unit_cost x 10",
+            "matches": true
+          },
+          {
+            "field": "margin_at_list",
+            "value": 360,
+            "db_source": "(list - cost) x 10",
+            "matches": true
+          },
+          {
+            "field": "max_discount_pct_without_loss",
+            "value": 62.1,
+            "db_source": "(list - cost) / list",
+            "matches": true
+          }
+        ]
+      }
+    }
+  ],
+  "database_unchanged": true
+}

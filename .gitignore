@@ -1,0 +1,36 @@
+# Secrets: never commit a real .env. Only .env.example (placeholders) goes in the repo.
+.env
+.env.*
+!.env.example
+
+# Data: HW5 Problem 11 requires BOTH databases in the repo; anything else in data/ stays local.
+data/*
+!data/campus_customs.db
+!data/campus_customs_new.db
+*.db-journal
+
+# Course data download (unzipped into data/)
+*.zip
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Node / Vite
+node_modules/
+dist/
+*.tsbuildinfo
+.vite/
+
+# Editor / OS clutter
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# Backend runtime state (pending human approvals); the audit trail keeps the permanent record
+output/approval_queue.json
